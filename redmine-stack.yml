@@ -35,7 +35,7 @@ services:
       restart_policy:
         condition: none
     volumes:
-      - redmine-files:/usr/src/redmine/files
+      - ./redmine-files:/usr/src/redmine/files
       - ./plugins:/usr/src/redmine/plugins
     configs:
       - source: wait_for_it
@@ -81,7 +81,6 @@ services:
       com.bolyshev.redmine.description: "Redmine database service"
 
 volumes:
-  redmine-files:
   redmine-db-datadir:
   redmine-backup:
 

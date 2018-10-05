@@ -1,0 +1,10 @@
+# Upgrade database
+docker container exec -w /usr/src/redmine CONT_ID sh -c "bundle exec rake db:migrate RAILS_ENV=production"
+
+
+# Upgrade plugins
+bundle exec rake redmine:plugins:migrate RAILS_ENV=production
+
+# Restart service
+docker stack services <stack_name>
+docker service update --force SRV_ID
