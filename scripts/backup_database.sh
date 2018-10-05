@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+/usr/bin/mysqldump -R -S /var/run/mysqld/mysqld.sock --add-drop-database -u${REDMINE_DB_USERNAME} --password=${REDMINE_DB_PASSWORD} ${REDMINE_DB_DATABASE:-redmine} | gzip -c > /backup/${REDMINE_DB_DATABASE:-redmine}-$(date +%F_%H:%M).sql.gz

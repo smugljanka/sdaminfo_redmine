@@ -1,0 +1,101 @@
+# Usage:
+# docker stack init --advertise-addr=IP
+# docker stack deploy -c ./redmine-stack.yml redmine
+version: '3.6'
+
+services:
+
+  redmine-frontend:
+    image: nginx:alpine
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
+    ports:
+      - "80:80"
+    configs:
+      - source: nginx.conf
+        target: /etc/nginx/nginx.conf
+      - source: nginx-redmine.conf
+        target: /etc/nginx/conf.d/redmine.conf
+    healthcheck:
+      test: wget -S -q http://127.0.0.1/healthcheck/ &>/dev/stdout | egrep -o "HTTP\/.\.. 200 OK" >/dev/null
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - redmine-net
+    labels:
+      com.bolyshev.redmine.description: "HTTP server"
+
+  redmine-backend:
+    image: redmine
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
+    volumes:
+      - redmine-files:/usr/src/redmine/files
+      - ./plugins:/usr/src/redmine/plugins
+    configs:
+      - source: wait_for_it
+        target: /wait_for_it.sh
+        mode: 0555
+    env_file:
+      - ./env/database.env
+    networks:
+      - redmine-net
+    command: ["/wait_for_it.sh", "-t", "60", "db:3306", "--", "/docker-entrypoint.sh", "rails", "server", "-b", "0.0.0.0"]
+    labels:
+      com.bolyshev.redmine.description: "Redmine service 3.4.6/stable"
+
+  redmine-db:
+    image: mysql:5.7
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
+      placement:
+        constraints: [node.role == manager]
+    ports:
+      - 3406:3306
+    configs:
+      - source: backup_database
+        target: /backup-redmine-db.sh
+        mode: 0555
+    env_file:
+      - ./env/database.env
+    volumes:
+      - redmine-db-datadir:/var/lib/mysql
+      - redmine-backup:/backup
+    healthcheck:
+      test: mysql -uroot --password=$$MYSQL_ROOT_PASSWORD -e "quit" 2>/dev/null
+      interval: 10s
+      timeout: 10s
+      retries: 3
+    networks:
+      redmine-net:
+        aliases:
+          - db
+    labels:
+      com.bolyshev.redmine.description: "Redmine database service"
+
+volumes:
+  redmine-files:
+  redmine-db-datadir:
+  redmine-backup:
+
+networks:
+  redmine-net:
+    driver: overlay
+    attachable: true
+
+configs:
+  wait_for_it:
+    file: ./scripts/wait_for_it.sh
+  nginx-redmine.conf:
+    file: ./nginx/redmine.conf
+  nginx.conf:
+    file: ./nginx/nginx.conf
+  backup_database:
+    file: ./scripts/backup_database.sh
