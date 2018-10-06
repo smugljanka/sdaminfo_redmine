@@ -10,7 +10,7 @@ services:
     deploy:
       replicas: 1
       restart_policy:
-        condition: none
+        condition: on-failure
     ports:
       - "80:80"
     configs:
@@ -29,11 +29,11 @@ services:
       com.bolyshev.redmine.description: "HTTP server"
 
   redmine-backend:
-    image: redmine
+    image: redmine:3.4.6
     deploy:
       replicas: 1
       restart_policy:
-        condition: none
+        condition: on-failure
     volumes:
       - ./redmine-files:/usr/src/redmine/files
       - ./plugins:/usr/src/redmine/plugins
@@ -54,7 +54,7 @@ services:
     deploy:
       replicas: 1
       restart_policy:
-        condition: none
+        condition: on-failure
       placement:
         constraints: [node.role == manager]
     ports:
