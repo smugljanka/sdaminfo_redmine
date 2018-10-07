@@ -1,10 +1,22 @@
 # Upgrade database
-docker container exec -w /usr/src/redmine CONT_ID sh -c "bundle exec rake db:migrate RAILS_ENV=production"
+1. Delete tables from redmine database - fix error Mysql2::Error: Table 'queries_roles' already exists
+DROP TABLE `redmine`.`queries_roles`;
+DROP TABLE `redmine`.`custom_fields_roles`;
+DROP TABLE `redmine`.`email_addresses`;
+DROP TABLE `redmine`.`roles_managed_roles`;
+DROP TABLE `redmine`.`imports`;
+DROP TABLE `redmine`.`import_items`;
+DROP TABLE `redmine`.`custom_field_enumerations`;
+
+
+2. Run db upgrade
+docker container exec -w /usr/src/redmine 8d00d02691db sh -c "bundle exec rake db:migrate RAILS_ENV=production"
 
 
 # Upgrade plugins
-bundle exec rake redmine:plugins:migrate RAILS_ENV=production
+docker container exec -w /usr/src/redmine 8d00d02691db sh -c "bundle exec rake redmine:plugins:migrate RAILS_ENV=production"
 
 # Restart service
 docker stack services <stack_name>
 docker service update --force SRV_ID
+  where SRV_ID - ID of redmine-backend service
