@@ -67,7 +67,7 @@ services:
       - ./env/database.env
     volumes:
       - redmine-db-datadir:/var/lib/mysql
-      - redmine-backup:/backup
+      - ./redmine-backup:/backup
     healthcheck:
       test: mysql -uroot --password=$$MYSQL_ROOT_PASSWORD -e "quit" 2>/dev/null
       interval: 10s
