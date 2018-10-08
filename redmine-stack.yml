@@ -1,6 +1,7 @@
 # Usage:
 # docker stack init --advertise-addr=IP
 # docker stack deploy -c ./redmine-stack.yml redmine
+
 version: '3.6'
 
 services:
@@ -80,6 +81,34 @@ services:
     labels:
       com.bolyshev.redmine.description: "Redmine database service"
 
+  cron:
+    image: library/docker:stable
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./cron/crontab:/tmp/cron-root:ro
+      - ./cron/scripts/wrapper.sh:/docker-wrapper.sh
+    configs:
+      - source: cron_entrypoint
+        target: /docker-entrypoint.sh
+        mode: 0755
+    env_file:
+      - ./env/common.env
+    environment:
+      DOCKER_HOST: "unix:///var/run/docker.sock"
+    entrypoint: ["/docker-entrypoint.sh"]
+    command: ["crond", "-f", "-l2", "-L", "/var/log/cron.log"]
+    healthcheck:
+      test: ps aux | grep '[c]rond' || exit 1
+      interval: 3s
+      timeout: 10s
+      retries: 3
+    networks:
+      - redmine-net
+
 volumes:
   redmine-db-datadir:
   redmine-backup:
@@ -98,3 +127,6 @@ configs:
     file: ./nginx/nginx.conf
   backup_database:
     file: ./scripts/backup_database.sh
+  cron_entrypoint:
+    file: ./cron/scripts/docker-entrypoint.sh
+

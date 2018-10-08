@@ -10,11 +10,11 @@ DROP TABLE `redmine`.`custom_field_enumerations`;
 
 
 2. Run db upgrade
-docker container exec -w /usr/src/redmine 8d00d02691db sh -c "bundle exec rake db:migrate RAILS_ENV=production"
+docker container exec -w /usr/src/redmine 9cd58c471e3d sh -c "bundle exec rake db:migrate RAILS_ENV=production"
 
 
 # Upgrade plugins
-docker container exec -w /usr/src/redmine 8d00d02691db sh -c "bundle exec rake redmine:plugins:migrate RAILS_ENV=production"
+docker container exec -w /usr/src/redmine 9cd58c471e3d sh -c "bundle exec rake redmine:plugins:migrate RAILS_ENV=production"
 
 # Restart service
 docker stack services <stack_name>
