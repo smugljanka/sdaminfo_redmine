@@ -20,7 +20,6 @@ services:
       - source: nginx-redmine.conf
         target: /etc/nginx/conf.d/redmine.conf
     volumes:
-      - redmine-letsencrypt-www:/var/www/letsencrypt:rw
       - redmine-letsencrypt:/etc/letsencrypt:ro
     healthcheck:
       test: wget -S -q http://127.0.0.1/healthcheck/ &>/dev/stdout | egrep -o "HTTP\/.\.. 200 OK" >/dev/null
@@ -116,7 +115,6 @@ volumes:
   redmine-db-datadir:
   redmine-backup:
   redmine-letsencrypt:
-  redmine-letsencrypt-www:
 
 networks:
   redmine-net:
