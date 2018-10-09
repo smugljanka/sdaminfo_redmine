@@ -20,3 +20,13 @@ docker container exec -w /usr/src/redmine 9cd58c471e3d sh -c "bundle exec rake r
 docker stack services <stack_name>
 docker service update --force SRV_ID
   where SRV_ID - ID of redmine-backend service
+
+
+
+# Tips
+1. Update configs
+docker service ls
+docker service update --config-rm=redmine_nginx-redmine.conf --force 4l4iis28dggh
+docker config rm redmine_nginx-redmine.conf
+docker stack deploy -c ./redmine-stack.yml redmine
+docker container prune -f
