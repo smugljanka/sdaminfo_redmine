@@ -20,7 +20,7 @@ services:
       - source: nginx-redmine.conf
         target: /etc/nginx/conf.d/redmine.conf
     volumes:
-      - redmine-letsencrypt:/etc/letsencrypt:ro
+      - redmine-frontend-cache:/var/cache/nginx:rw
     healthcheck:
       test: wget -S -q http://127.0.0.1/healthcheck/ &>/dev/stdout | egrep -o "HTTP\/.\.. 200 OK" >/dev/null
       interval: 30s
@@ -114,7 +114,7 @@ services:
 volumes:
   redmine-db-datadir:
   redmine-backup:
-  redmine-letsencrypt:
+  redmine-frontend-cache:
 
 networks:
   redmine-net:

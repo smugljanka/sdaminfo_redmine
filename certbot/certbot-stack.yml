@@ -1,0 +1,29 @@
+# Usage:
+# docker stack init --advertise-addr=IP
+# docker stack deploy -c ./certbot-stack.yml certbot
+
+version: '3.6'
+
+services:
+  certbot:
+    image: certbot/certbot:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
+    volumes:
+      - ./certbot-letsencrypt:/etc/letsencrypt:rw
+      - redmine-frontend-cache:/var/cache/nginx:rw
+    entrypoint: ["/bin/sh"]
+    networks:
+      - certbot-net
+    labels:
+      com.bolyshev.rm.description: "Certbot server"
+
+volumes:
+  redmine-frontend-cache:
+
+networks:
+  - certbot-net
+
+
