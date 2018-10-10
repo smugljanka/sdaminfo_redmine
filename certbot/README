@@ -1,1 +1,0 @@
-docker run --entrypoint="/bin/sh" --rm -dit -v `pwd`/certbot-letsencrypt:/etc/letsencrypt:rw -v redmine-frontend-cache:/cache:rw certbot/certbot
