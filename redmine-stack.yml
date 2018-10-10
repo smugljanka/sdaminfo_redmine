@@ -6,6 +6,7 @@
 version: '3.6'
 
 services:
+
   certbot:
     image: certbot/certbot:latest
     deploy:
@@ -15,13 +16,12 @@ services:
     volumes:
       - ./redmine-letsencrypt:/etc/letsencrypt:rw
       - redmine-frontend-cache:/cache:rw
-    entrypoint: ["/bin/bash"]
-    command: ["ls /cache"]
+    command: certonly --webroot --email admin@bolyshev.com -d rm.bolyshev.com --agree-tos -w /cache
     networks:
       - redmine-net
     labels:
       com.bolyshev.rm.description: "Certbot server"
-
+      
   redmine-frontend:
     image: nginx:alpine
     deploy:
