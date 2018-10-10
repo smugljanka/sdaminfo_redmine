@@ -22,9 +22,11 @@ docker service update --force SRV_ID
 
 
 ##### Tips
-1. Update configs at "redmine-frontend" service
-docker service update --config-rm=redmine_nginx-entrypoint --force $(docker service ls -f "name=redmine_redmine-frontend" -q)
-docker config rm redmine_nginx-entrypoint
+1. Update configs at "redmine_nginx-redmine.conf" service
+docker service update --config-rm=redmine_nginx-redmine.conf --force $(docker service ls -f "name=redmine_redmine-frontend" -q)
+docker service update --config-rm=redmine_nginx.conf --force $(docker service ls -f "name=redmine_redmine-frontend" -q)
+docker config rm redmine_nginx-redmine.conf
+docker config rm redmine_nginx.conf
 docker stack deploy -c ./redmine-stack.yml redmine
 docker container prune -f
 
