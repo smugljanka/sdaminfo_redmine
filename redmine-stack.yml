@@ -6,22 +6,6 @@
 version: '3.6'
 
 services:
-
-  certbot:
-    image: certbot/certbot:latest
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: none
-    volumes:
-      - ./redmine-letsencrypt:/etc/letsencrypt:rw
-      - redmine-frontend-cache:/cache:rw
-    command: certonly --webroot --email admin@bolyshev.com -d rm.bolyshev.com --agree-tos -w /cache
-    networks:
-      - redmine-net
-    labels:
-      com.bolyshev.rm.description: "Certbot server"
-      
   redmine-frontend:
     image: nginx:alpine
     deploy:
@@ -30,14 +14,19 @@ services:
         condition: on-failure
     ports:
       - "80:80"
+      - "443:433"
     configs:
       - source: nginx.conf
         target: /etc/nginx/nginx.conf
       - source: nginx-redmine.conf
         target: /etc/nginx/conf.d/redmine.conf
+      - source: nginx-entrypoint
+        target: /nginx-entrypoint
+        mode: 0755
     volumes:
       - ./redmine-letsencrypt:/etc/letsencrypt:rw
       - redmine-frontend-cache:/var/cache/nginx:rw
+    entrypoint: ["/nginx-entrypoint.sh"]
     healthcheck:
       test: wget -S -q http://127.0.0.1/healthcheck/ &>/dev/stdout | egrep -o "HTTP\/.\.. 200 OK" >/dev/null
       interval: 30s
@@ -149,4 +138,5 @@ configs:
     file: ./scripts/backup_database.sh
   cron_entrypoint:
     file: ./cron/scripts/docker-entrypoint.sh
-
+  nginx-entrypoint:
+    file: ./scripts/nginx-entrypoint.sh
