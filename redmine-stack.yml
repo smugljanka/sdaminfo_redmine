@@ -1,10 +1,25 @@
 # Usage:
+# mkdir certbot-letsencrypt plugins redmine-backup redmine-file
 # docker stack init --advertise-addr=IP
 # docker stack deploy -c ./redmine-stack.yml redmine
 
 version: '3.6'
 
 services:
+  certbot:
+    image: certbot/certbot:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
+    volumes:
+      - redmine-letsencrypt:/etc/letsencrypt:rw
+      - redmine-frontend-cache:/cache:rw
+    entrypoint: ["/bin/sh"]
+    networks:
+      - redmine-net
+    labels:
+      com.bolyshev.rm.description: "Certbot server"
 
   redmine-frontend:
     image: nginx:alpine
@@ -20,6 +35,7 @@ services:
       - source: nginx-redmine.conf
         target: /etc/nginx/conf.d/redmine.conf
     volumes:
+      - redmine-letsencrypt:/etc/letsencrypt:rw
       - redmine-frontend-cache:/var/cache/nginx:rw
     healthcheck:
       test: wget -S -q http://127.0.0.1/healthcheck/ &>/dev/stdout | egrep -o "HTTP\/.\.. 200 OK" >/dev/null
@@ -115,6 +131,7 @@ volumes:
   redmine-db-datadir:
   redmine-backup:
   redmine-frontend-cache:
+  redmine-letsencrypt:
 
 networks:
   redmine-net:

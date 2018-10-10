@@ -1,5 +1,6 @@
 # Usage:
 # docker stack init --advertise-addr=IP
+# mkdir certbot-letsencrypt
 # docker stack deploy -c ./certbot-stack.yml certbot
 
 version: '3.6'
