@@ -1,0 +1,5 @@
+secrets:
+  front-cert:
+    file: /opt/www/redmine/redmine-letsencrypt/live/rm.bolyshev.com/fullchain.pem
+  front-key:
+    file: /opt/www/redmine/redmine-letsencrypt/live/rm.bolyshev.com/privkey.pem

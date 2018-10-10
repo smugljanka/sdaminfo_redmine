@@ -1,11 +1,15 @@
 # Usage:
 # mkdir redmine-letsencrypt plugins redmine-backup redmine-file
 # docker stack init --advertise-addr=IP
+#
+# Dev stack https://local.redmine/
 # docker stack deploy -c ./redmine-stack.yml redmine
+# Prod stack https://rm.bolyshev.com/
+# docker stack deploy -c ./redmine-stack.yml -c ./redmine-stack-prod.yml redmine
 
 version: '3.6'
-
 services:
+
   redmine-frontend:
     image: nginx:alpine
     deploy:
@@ -14,7 +18,7 @@ services:
         condition: none
     ports:
       - "80:80"
-      - "443:433"
+      - "443:443"
     configs:
       - source: nginx.conf
         target: /etc/nginx/nginx.conf
@@ -23,6 +27,13 @@ services:
       - source: nginx-entrypoint
         target: /nginx-entrypoint.sh
         mode: 0755
+    secrets:
+      - source: front-cert
+        target: server.crt.pem
+        mode: 0664
+      - source: front-key
+        target: server.key.pem
+        mode: 0600
     volumes:
       - ./redmine-letsencrypt:/etc/letsencrypt:rw
       - redmine-front-www:/var/www
@@ -141,3 +152,8 @@ configs:
   nginx-entrypoint:
     file: ./scripts/nginx-entrypoint.sh
 
+secrets:
+  front-cert:
+    file: ./SSL/redmine.local.crt.pem
+  front-key:
+    file: ./SSL/redmine.local.key.pem

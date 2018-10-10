@@ -1,3 +1,4 @@
+############ HOWTO UPGRADE REDMINE ###########################
 # Upgrade database
 1. Delete tables from redmine database - fix error Mysql2::Error: Table 'queries_roles' already exists
 DROP TABLE `redmine`.`queries_roles`;
@@ -8,10 +9,8 @@ DROP TABLE `redmine`.`imports`;
 DROP TABLE `redmine`.`import_items`;
 DROP TABLE `redmine`.`custom_field_enumerations`;
 
-
 2. Run db upgrade
 docker container exec -w /usr/src/redmine 9cd58c471e3d sh -c "bundle exec rake db:migrate RAILS_ENV=production"
-
 
 # Upgrade plugins
 docker container exec -w /usr/src/redmine 9cd58c471e3d sh -c "bundle exec rake redmine:plugins:migrate RAILS_ENV=production"
@@ -22,12 +21,59 @@ docker service update --force SRV_ID
   where SRV_ID - ID of redmine-backend service
 
 
-
-# Tips
+##### Tips
 1. Update configs at "redmine-frontend" service
-docker service update --config-rm=redmine_nginx-redmine.conf --force $(docker service ls -f "name=redmine_redmine-frontend" -q)
-docker config rm redmine_nginx-redmine.conf
+docker service update --config-rm=redmine_nginx-entrypoint --force $(docker service ls -f "name=redmine_redmine-frontend" -q)
+docker config rm redmine_nginx-entrypoint
+docker stack deploy -c ./redmine-stack.yml redmine
+docker container prune -f
+
+2. Update frontend service
+docker service update --force $(docker service ls -f "name=redmine_redmine-frontend" -q)
 docker stack deploy -c ./redmine-stack.yml redmine
 docker container prune -f
 
 
+########################################################################################################################
+#### CERTBOT configuration
+########################################################################################################################
+
+1. First time when the redmine stack already up an running
+docker run -it --rm -v /opt/www/logs:/var/log/letsencrypt:rw -v /opt/www/redmine/redmine-letsencrypt:/etc/letsencrypt:rw -v redmine_redmine-front-www:/var/www:rw certbot/certbot certonly --webroot -w /var/www --email admin@bolyshev.com -d rm.bolyshev.com --agree-tos
+
+# You should get the following
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Plugins selected: Authenticator webroot, Installer None
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Would you be willing to share your email address with the Electronic Frontier
+Foundation, a founding partner of the Let's Encrypt project and the non-profit
+organization that develops Certbot? We'd like to send you email about our work
+encrypting the web, EFF news, campaigns, and ways to support digital freedom.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(Y)es/(N)o: Yes
+Obtaining a new certificate
+Performing the following challenges:
+http-01 challenge for rm.bolyshev.com
+Using the webroot path /var/www for all unmatched domains.
+Waiting for verification...
+Cleaning up challenges
+
+IMPORTANT NOTES:
+ - Congratulations! Your certificate and chain have been saved at:
+   /etc/letsencrypt/live/rm.bolyshev.com/fullchain.pem
+   Your key file has been saved at:
+   /etc/letsencrypt/live/rm.bolyshev.com/privkey.pem
+   Your cert will expire on 2019-01-08. To obtain a new or tweaked
+   version of this certificate in the future, simply run certbot
+   again. To non-interactively renew *all* of your certificates, run
+   "certbot renew"
+ - Your account credentials have been saved in your Certbot
+   configuration directory at /etc/letsencrypt. You should make a
+   secure backup of this folder now. This configuration directory will
+   also contain certificates and private keys obtained by Certbot so
+   making regular backups of this folder is ideal.
+ - If you like Certbot, please consider supporting our work by:
+
+   Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+   Donating to EFF:                    https://eff.org/donate-le
