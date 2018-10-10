@@ -15,7 +15,8 @@ services:
     volumes:
       - ./redmine-letsencrypt:/etc/letsencrypt:rw
       - redmine-frontend-cache:/cache:rw
-    entrypoint: /bin/sh
+    entrypoint: ["/bin/bash"]
+    command: ["ls /cache"]
     networks:
       - redmine-net
     labels:
