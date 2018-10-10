@@ -1,11 +1,11 @@
 #!/bin/sh
 
 # Create acme-challenge folder in /var/www
-acme-challenge="/var/www/.well-known/acme-challenge"
-if [ ! -e "${acme-challenge}" ];then
-    mkdir -p ${acme-challenge}
-    chown -R nginx. ${acme-challenge}
-    cat > ${acme-challenge}/index.html <<EOF
+acme="/var/www/.well-known/acme-challenge"
+if [ ! -e "${acme}" ];then
+    mkdir -p ${acme}
+    chown -R nginx. ${acme}
+    cat > ${acme}/index.html <<EOF
 acme-challenge test page !
 EOF
 fi
