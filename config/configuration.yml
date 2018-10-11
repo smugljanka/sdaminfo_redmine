@@ -1,0 +1,11 @@
+production:
+  email_delivery:
+    delivery_method: :async_smtp
+    async_smtp_settings:
+        address: redmine-mta
+        port: 25
+        authentication: :plain
+        domain: rm.bolyshev.com
+        user_name: redmine@rm.bolyshev.com
+        password: St45Swq1K
+

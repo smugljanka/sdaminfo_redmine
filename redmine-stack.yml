@@ -53,10 +53,11 @@ services:
     deploy:
       replicas: 1
       restart_policy:
-        condition: on-failure
+        condition: none
     volumes:
       - ./redmine-files:/usr/src/redmine/files
       - ./plugins:/usr/src/redmine/plugins
+      - ./config/configuration.yml:/usr/src/redmine/config/configuration.yml
     configs:
       - source: wait_for_it
         target: /wait_for_it.sh
@@ -77,8 +78,6 @@ services:
         condition: on-failure
       placement:
         constraints: [node.role == manager]
-    ports:
-      - 3406:3306
     configs:
       - source: backup_database
         target: /backup-redmine-db.sh
@@ -122,6 +121,23 @@ services:
     command: ["crond", "-f", "-l2", "-L", "/var/log/cron.log"]
     healthcheck:
       test: ps aux | grep '[c]rond' || exit 1
+      interval: 3s
+      timeout: 10s
+      retries: 3
+    networks:
+      - redmine-net
+
+  redmine-mta:
+    image: catatnight/postfix
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
+    environment:
+      maildomain: rm.bolyshev.com
+      smtp_user: "redmine:St45Swq1K"
+    healthcheck:
+      test: pgrep master || exit 1
       interval: 3s
       timeout: 10s
       retries: 3
