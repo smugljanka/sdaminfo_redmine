@@ -2,3 +2,5 @@
 #* * * * * /bin/uname -a &>/var/log/cron.log
 00 23 * * * /docker-wrapper.sh --stack ${STACK_NAME:-redmine} --service redmine-db -- /backup-redmine-db.sh &>/var/log/cron.log
 00 23 * * * /docker-wrapper.sh --stack ${STACK_NAME:-redmine} --service redmine-db -- find /backup -type f -mtyme +3 -exec rm -rf {} \;
+
+#

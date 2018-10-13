@@ -35,7 +35,7 @@ services:
         target: server.key.pem
         mode: 0600
     volumes:
-      - ./redmine-letsencrypt:/etc/letsencrypt:rw
+      - ./redmine-letsencrypt:/etc/letsencrypt:ro
       - redmine-front-www:/var/www
     entrypoint: ["/nginx-entrypoint.sh"]
     healthcheck:
@@ -121,23 +121,6 @@ services:
     command: ["crond", "-f", "-l2", "-L", "/var/log/cron.log"]
     healthcheck:
       test: ps aux | grep '[c]rond' || exit 1
-      interval: 3s
-      timeout: 10s
-      retries: 3
-    networks:
-      - redmine-net
-
-  redmine-mta:
-    image: catatnight/postfix
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: none
-    environment:
-      maildomain: rm.bolyshev.com
-      smtp_user: "redmine:St45Swq1K"
-    healthcheck:
-      test: pgrep master || exit 1
       interval: 3s
       timeout: 10s
       retries: 3

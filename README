@@ -79,3 +79,43 @@ IMPORTANT NOTES:
 
    Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
    Donating to EFF:                    https://eff.org/donate-le
+
+2. Renew certificates
+docker run --rm -v /opt/www/logs:/var/log/letsencrypt:rw -v /opt/www/redmine/redmine-letsencrypt:/etc/letsencrypt:rw -v redmine_redmine-front-www:/var/www:rw certbot/certbot renew
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Processing /etc/letsencrypt/renewal/rm.bolyshev.com.conf
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Cert not yet due for renewal
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+The following certs are not due for renewal yet:
+  /etc/letsencrypt/live/rm.bolyshev.com/fullchain.pem expires on 2019-01-08 (skipped)
+No renewals were attempted.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+
+######### MTA configuration on docker host  ##################
+# http://www.redmine.org/projects/redmine/wiki/EmailConfiguration
+# http://doc.nethence.com/docker/postfix
+#
+# /etc/postfix/main.cf
+queue_directory = /var/spool/postfix
+command_directory = /usr/sbin
+daemon_directory = /usr/libexec/postfix
+data_directory = /var/lib/postfix
+mail_owner = postfix
+myhostname = rm.bolyshev.com
+mydomain = bolyshev.com
+myorigin = $myhostname
+inet_interfaces = localhost, 172.17.0.1, 172.18.0.1
+inet_protocols = all
+mydestination = $myhostname, localhost.$mydomain, localhost
+unknown_local_recipient_reject_code = 550
+mynetworks_style = host
+mynetworks = 127.0.0.0/8, 172.18.0.0/16, 172.17.0.0/16
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
