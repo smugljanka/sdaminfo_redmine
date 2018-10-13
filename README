@@ -1,6 +1,7 @@
 ##############################################################
-##           REDMINE                                        ##
-############ HOWTO UPGRADE REDMINE ###########################
+##          UPGRADE REDMINE                                 ##
+##############################################################
+
 # Upgrade database
 1. Delete tables from redmine database - fix error Mysql2::Error: Table 'queries_roles' already exists
 DROP TABLE `redmine`.`queries_roles`;
