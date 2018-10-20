@@ -9,7 +9,7 @@ version: '3.6'
 services:
 
   mail-relay:
-    image: my_postfix
+    image: smugljanka/postfix-relay-opendkim
     deploy:
       replicas: 1
       restart_policy:
@@ -38,7 +38,7 @@ services:
       - redmine_redmine-net
 
   mail-dkim:
-    image: my_postfix
+    image: smugljanka/postfix-relay-opendkim
     deploy:
       replicas: 1
       restart_policy:

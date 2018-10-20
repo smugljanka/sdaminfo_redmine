@@ -4,3 +4,4 @@ redmine-files/
 plugins/
 redmine-letsencrypt/
 env/database.env
+
