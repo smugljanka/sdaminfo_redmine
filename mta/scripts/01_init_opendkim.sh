@@ -28,12 +28,12 @@ EOF
 
 cat > /etc/opendkim/ExternalHosts <<EOF
 *.${POSTFIX_DOMAIN}
-172.*.*.*
 EOF
 
 cat > /etc/opendkim/TrustedHosts <<EOF
 127.0.0.1
 localhost
+10.*.*.*
 EOF
 
 # Set correct permission for the user opendkim

@@ -1,4 +1,21 @@
 ##############################################################
+## PREREQUISITES                                            ##
+##############################################################
+1. Prepare a database configuration and make changes to your database parameters
+cp env/database.env.example env/database.env
+vi env/database.env
+
+2. Deploy redmine stack
+2.1 Prepare stack secrets in redmine-stack-prod.yml
+2.2 Deploy new stack "redmine"
+docker stack deploy -c ./redmine-stack.yml -c ./redmine-stack-prod.yml redmine
+
+3. Deploy MTA stack
+3.1 Prepare stack secrets in mta-stack-prod.yml
+3.2 Deploy new stack "mta"
+
+
+##############################################################
 ##          UPGRADE REDMINE                                 ##
 ##############################################################
 
@@ -99,9 +116,7 @@ The following certs are not due for renewal yet:
 No renewals were attempted.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-
-
-######### MTA configuration on docker host  ##################
+######### Docker host MTA configuration ##################
 # http://www.redmine.org/projects/redmine/wiki/EmailConfiguration
 # http://doc.nethence.com/docker/postfix
 #
@@ -113,12 +128,12 @@ data_directory = /var/lib/postfix
 mail_owner = postfix
 myhostname = rm.bolyshev.com
 mydomain = bolyshev.com
-myorigin = $myhostname
-inet_interfaces = localhost, 172.17.0.1, 172.18.0.1
+myorigin = $mydomain
+inet_interfaces = localhost,172.17.0.1,172.18.0.1
 inet_protocols = all
 mydestination = $myhostname, localhost.$mydomain, localhost
 unknown_local_recipient_reject_code = 550
 mynetworks_style = host
-mynetworks = 127.0.0.0/8, 172.18.0.0/16, 172.17.0.0/16
+mynetworks = 127.0.0.0/8,172.18.0.0/16,172.17.0.0/16
 alias_maps = hash:/etc/aliases
 alias_database = hash:/etc/aliases
