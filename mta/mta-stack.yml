@@ -1,0 +1,83 @@
+# MTA stack
+#
+# Pre-requisites:
+# mkdir postfix-pool
+#
+# Usage:
+# docker stack init --advertise-addr=IP
+#
+# docker stack deploy -c ./mta-stack.yml mta
+
+version: '3.6'
+services:
+
+  mail-relay:
+    image: my_postfix
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
+    ports:
+      - "25:25"
+    volumes:
+      - postfix-pool:/var/spool/postfix
+      - ./scripts/01_init_postfix.sh:/docker-entrypoint.d/01_init_postfix.sh
+      - ./scripts/02_init_rsyslog.sh:/docker-entrypoint.d/02_init_rsyslog.sh
+    environment:
+      TZ: UTC
+      POSTFIX_NETWORKS: '127.0.0.0/8,172.18.0.0/16,172.17.0.0/16'
+      POSTFIX_HOSTNAME: rm.bolyshev.com
+      POSTFIX_DOMAIN: bolyshev.com
+      DKIM_ADDRESS: mail-dkim
+      DKIM_PORT: 14999
+    entrypoint: ["/docker-entrypoint.sh"]
+    command: ["postfix", "start-fg"]
+    healthcheck:
+      test: ps aux | grep 'master' || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - redmine-net
+
+  mail-dkim:
+    image: my_postfix
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: none
+    secrets:
+      - source: domain-dkim-key
+        target: domain.private
+        mode: 600
+        uid: "100"
+        gid: "101"
+    volumes:
+      - ./scripts/01_init_opendkim.sh:/docker-entrypoint.d/01_init_opendkim.sh
+      - ./scripts/02_init_rsyslog.sh:/docker-entrypoint.d/02_init_rsyslog.sh
+    environment:
+      TZ: UTC
+      POSTFIX_DOMAIN: bolyshev.com
+      DKIM_SELECTOR: mail
+      DKIM_PORT: 14999
+    entrypoint: ["/docker-entrypoint.sh"]
+    command: ["opendkim", "-f", "-l"]
+    healthcheck:
+      test: ps aux | grep 'opendkim' || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 3
+    networks:
+      - redmine-net
+
+volumes:
+  postfix-pool:
+
+networks:
+  redmine-net:
+    driver: overlay
+    attachable: true
+
+secrets:
+  domain-dkim-key:
+    file: ./SSL/redmine.local.key.pem
