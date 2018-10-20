@@ -2,4 +2,4 @@ version: '3.6'
 
 secrets:
   domain-dkim-key:
-    file: /opt/www/redmine/redmine-mail-key/bolyshev.key.priv
+    file: /opt/www/postfix_dkim_keys/bolyshev.com.priv

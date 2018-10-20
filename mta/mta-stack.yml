@@ -1,12 +1,9 @@
 # MTA stack
 #
-# Pre-requisites:
-# mkdir postfix-pool
-#
 # Usage:
 # docker stack init --advertise-addr=IP
 #
-# docker stack deploy -c ./mta-stack.yml mta
+# docker stack deploy -c ./mta-stack.yml -c ./mta-stack-prod.yml mta
 
 version: '3.6'
 services:
@@ -17,8 +14,8 @@ services:
       replicas: 1
       restart_policy:
         condition: none
-    ports:
-      - "25:25"
+#    ports:
+#      - "25:25"
     volumes:
       - postfix-pool:/var/spool/postfix
       - ./scripts/01_init_postfix.sh:/docker-entrypoint.d/01_init_postfix.sh
@@ -38,7 +35,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - redmine-net
+      - redmine_redmine-net
 
   mail-dkim:
     image: my_postfix
@@ -68,15 +65,14 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - redmine-net
+      - redmine_redmine-net
 
 volumes:
   postfix-pool:
 
 networks:
-  redmine-net:
-    driver: overlay
-    attachable: true
+  redmine_redmine-net:
+    external: true
 
 secrets:
   domain-dkim-key:

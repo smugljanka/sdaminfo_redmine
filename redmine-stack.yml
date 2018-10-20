@@ -1,5 +1,9 @@
-# Usage:
+# Redmine stack
+#
+# Pre-requisites:
 # mkdir redmine-letsencrypt plugins redmine-backup redmine-file
+#
+# Usage:
 # docker stack init --advertise-addr=IP
 #
 # Dev stack https://local.redmine/
@@ -126,7 +130,6 @@ services:
       retries: 3
     networks:
       - redmine-net
-
 volumes:
   redmine-db-datadir:
   redmine-backup:

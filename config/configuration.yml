@@ -2,19 +2,16 @@ production:
   email_delivery:
     delivery_method: :async_smtp
     async_smtp_settings:
-        address: 172.17.0.1
+        address: mail-relay
         port: 25
         authentication: :nil
-        domain: rm.bolyshev.com
+        domain: bolyshev.com
 
 #production:
 #  email_delivery:
 #    delivery_method: :async_smtp
 #    async_smtp_settings:
-#        address: redmine-mta
+#        address: 172.17.0.1
 #        port: 25
-#        authentication: :login
-#        domain: rm.bolyshev.com
-#        user_name: redmine@rm.bolyshev.com
-#        password: St45Swq1K
-
+#        authentication: :nil
+#        domain: bolyshev.com
