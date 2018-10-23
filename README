@@ -133,7 +133,6 @@ inet_interfaces = localhost,172.17.0.1,172.18.0.1
 inet_protocols = all
 mydestination = $myhostname, localhost.$mydomain, localhost
 unknown_local_recipient_reject_code = 550
-mynetworks_style = host
 mynetworks = 127.0.0.0/8,172.18.0.0/16,172.17.0.0/16
 alias_maps = hash:/etc/aliases
 alias_database = hash:/etc/aliases

@@ -14,21 +14,22 @@ $ sudo docker pull smugljanka/postfix-relay-opendkim
 
 ## Usage 
 1. Change the following stack parameters in mta-stack.yml 
-   `
-   # You can specify the list of "trusted" network addresses, separated by commas. Default
-   # local network 127.0.0.0/8 will be added automatically.
-   # Or leave this variable empty or comment out to let Postfix do it for you
-   POSTFIX_NETWORKS='127.0.0.0/8,...',
-   # Set the internet hostname of this mail system.
-   POSTFIX_HOSTNAME=mx.<YOUR_DOMAIN>,
-   # Set the internet domain name of this mail system.
-   POSTFIX_DOMAIN=<YOUR_DOMAIN>,
-   # Set DKIM selector name that identified your public DKIM Key details of the Domain
-   DKIM_SELECTOR=<YOUR_DKIM_SELECTOR>,
-   # Set a regexp map to define trusted hosts into the postfix networks.
-   # All client connections to the mail-dkim service will be verified in according to
-   # the provided regexp map
-   POSTFIX_NETWORKS_REGEXP_MAP=10.*.*.*`
+   ```
+   1.1. You can specify the list of "trusted" network addresses, separated by commas. Default
+      local network 127.0.0.0/8 will be added automatically.
+      Leave this variable empty or comment out to let Postfix do it for you
+      POSTFIX_NETWORKS='127.0.0.0/8,...',
+   1.2. Set the internet hostname of this mail system.
+      POSTFIX_HOSTNAME=mx.<YOUR_DOMAIN>,
+   1.3. Set the internet domain name of this mail system.
+      POSTFIX_DOMAIN=<YOUR_DOMAIN>,
+   1.4. Set DKIM selector name that identified your public DKIM Key details of the Domain
+      DKIM_SELECTOR=<YOUR_DKIM_SELECTOR>,
+   1.5. Set a regexp map to define trusted hosts into the postfix networks.
+      All client connections to the mail-dkim service will be verified in according to
+      the provided regexp map
+      POSTFIX_NETWORKS_REGEXP_MAP=10.*.*.*
+   ```
    
 2. Generate RSA keys for your domain
 ```bash
