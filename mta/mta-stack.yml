@@ -1,9 +1,9 @@
 # MTA stack
-#
+#  
 # Usage:
 # docker stack init --advertise-addr=IP
 #
-# docker stack deploy -c ./mta-stack.yml -c ./mta-stack-prod.yml mta
+# docker stack deploy -c ./mta-stack.yml mta
 
 version: '3.6'
 services:
@@ -22,9 +22,9 @@ services:
       - ./scripts/02_init_rsyslog.sh:/docker-entrypoint.d/02_init_rsyslog.sh
     environment:
       TZ: UTC
-      POSTFIX_NETWORKS: '127.0.0.0/8,172.18.0.0/16,172.17.0.0/16'
-      POSTFIX_HOSTNAME: rm.bolyshev.com
-      POSTFIX_DOMAIN: bolyshev.com
+      POSTFIX_HOSTNAME: mx.<YOUR_MAIL_DOMAIN>
+      POSTFIX_DOMAIN: <YOUR_MAIL_DOMAIN>
+      POSTFIX_NETWORKS: ''
       DKIM_ADDRESS: mail-dkim
       DKIM_PORT: 14999
     entrypoint: ["/docker-entrypoint.sh"]
@@ -35,7 +35,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - redmine_redmine-net
+      - app-net
 
   mail-dkim:
     image: smugljanka/postfix-relay-opendkim
@@ -54,8 +54,9 @@ services:
       - ./scripts/02_init_rsyslog.sh:/docker-entrypoint.d/02_init_rsyslog.sh
     environment:
       TZ: UTC
-      POSTFIX_DOMAIN: bolyshev.com
-      DKIM_SELECTOR: mail
+      POSTFIX_DOMAIN: <YOUR_MAIL_DOMAIN>
+      POSTFIX_NETWORKS_REGEXP_MAP: '10.*.*.*'
+      DKIM_SELECTOR: <YOUR_DKIM_SELECTOR>
       DKIM_PORT: 14999
     entrypoint: ["/docker-entrypoint.sh"]
     command: ["opendkim", "-f", "-l"]
@@ -65,15 +66,15 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - redmine_redmine-net
+      - app-net
 
 volumes:
   postfix-pool:
 
 networks:
-  redmine_redmine-net:
+  app-net:
     external: true
 
 secrets:
   domain-dkim-key:
-    file: ./SSL/redmine.local.key.pem
+    file: ./path/to/your.domain.com.priv

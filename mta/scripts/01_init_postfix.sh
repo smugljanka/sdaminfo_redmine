@@ -20,8 +20,6 @@ postfix -e smtp_host_lookup="dns,native"
 
 ############# Update aliases
 cat > /etc/postfix/aliases <<EOF
-redmine:        root
-admin:          root
 # Basic system aliases -- these MUST be present.
 mailer-daemon:  postmaster
 postmaster:     root
@@ -134,10 +132,12 @@ postconf -e myorigin=\$mydomain
 
 # The list of "trusted" remote SMTP clients that have more privileges than "strangers".
 # If you specify the mynetworks list by hand, Postfix ignores the mynetworks_style setting.
-#postconf -e mynetworks="${POSTFIX_NETWORKS}"
-
-# Postfix  should  "trust"  remote SMTP clients in the same IP subnetworks as the local machine.
+if [ "${POSTFIX_NETWORKS:-##}" != "##" ]; then
+postconf -e mynetworks="127.0.0.0/8,${POSTFIX_NETWORKS}"
+else
+# Postfix should "trust" remote SMTP clients in the same IP subnetworks as the local machine.
 postconf -e mynetworks_style="subnet"
+fi
 
 # SMTP parameters
 postconf -e smtp_helo_name="${POSTFIX_DOMAIN}"   # The hostname to send in the SMTP HELO or EHLO command.
