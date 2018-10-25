@@ -1,7 +1,9 @@
 # Redmine stack
 #
 # Pre-requisites:
-# mkdir redmine-letsencrypt plugins redmine-backup redmine-file
+# git clone git@github.com:smugljanka/sdaminfo_redmine.git redmine
+# cd redmine
+# mkdir -p frontend-certs letsencrypt plugins redmine-backup redmine-file
 #
 # Usage:
 # docker stack init --advertise-addr=IP
@@ -26,21 +28,21 @@ services:
     configs:
       - source: nginx.conf
         target: /etc/nginx/nginx.conf
-      - source: nginx-redmine.conf
-        target: /etc/nginx/conf.d/redmine.conf
+      - source: nginx-virtualhost.conf
+        target: /etc/nginx/conf.d/virtualhost.conf
       - source: nginx-entrypoint
         target: /nginx-entrypoint.sh
         mode: 0755
     secrets:
       - source: front-cert
-        target: server.crt.pem
+        target: /etc/nginx/certs/fullchain.pem
         mode: 0664
       - source: front-key
-        target: server.key.pem
+        target: /etc/nginx/certs/privkey.pem
         mode: 0600
     volumes:
-      - ./redmine-letsencrypt:/etc/letsencrypt:ro
-      - redmine-front-www:/var/www
+      - ./frontend-certs:/etc/nginx/certs
+      - frontend-www:/var/www
     entrypoint: ["/nginx-entrypoint.sh"]
     healthcheck:
       test: wget -S -q http://127.0.0.1/healthcheck/ &>/dev/stdout | egrep -o "HTTP\/.\.. 200 OK" >/dev/null
@@ -133,7 +135,7 @@ services:
 volumes:
   redmine-db-datadir:
   redmine-backup:
-  redmine-front-www:
+  frontend-www:
 
 networks:
   redmine-net:
@@ -143,8 +145,8 @@ networks:
 configs:
   wait_for_it:
     file: ./scripts/wait_for_it.sh
-  nginx-redmine.conf:
-    file: ./nginx/redmine.conf
+  nginx-virtualhost.conf:
+    file: ./nginx/virtualhost.conf
   nginx.conf:
     file: ./nginx/nginx.conf
   backup_database:

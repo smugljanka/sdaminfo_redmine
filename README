@@ -101,7 +101,11 @@ IMPORTANT NOTES:
    Donating to EFF:                    https://eff.org/donate-le
 
 2. Renew certificates
-docker run --rm -v /opt/www/logs:/var/log/letsencrypt:rw -v /opt/www/redmine/redmine-letsencrypt:/etc/letsencrypt:rw -v redmine_redmine-front-www:/var/www:rw certbot/certbot renew
+docker run --rm -v /opt/www/logs:/var/log/letsencrypt:rw \
+                -v /opt/www/redmine/letsencrypt:/etc/letsencrypt:rw \
+                -v redmine_frontend-www:/var/www:rw \
+                -v /opt/www/redmine/frontend-certs:/certs:rw certbot/certbot renew
+
 Saving debug log to /var/log/letsencrypt/letsencrypt.log
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

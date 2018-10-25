@@ -2,6 +2,10 @@
 redmine-backup/
 redmine-files/
 plugins/
-redmine-letsencrypt/
+letsencrypt/
+!letsencrypt/renewal-hooks/deploy
+!letsencrypt/renewal-hooks/pre
+!letsencrypt/renewal-hooks/post
+frontend-certs/
 env/database.env
 
