@@ -35,13 +35,12 @@ services:
         mode: 0755
     secrets:
       - source: front-cert
-        target: /etc/nginx/certs/fullchain.pem
+        target: fullchain.pem
         mode: 0664
       - source: front-key
-        target: /etc/nginx/certs/privkey.pem
+        target: privkey.pem
         mode: 0600
     volumes:
-      - ./frontend-certs:/etc/nginx/certs
       - frontend-www:/var/www
     entrypoint: ["/nginx-entrypoint.sh"]
     healthcheck:
