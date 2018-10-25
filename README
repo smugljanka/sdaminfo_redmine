@@ -64,11 +64,8 @@ docker container prune -f
 
 1. Run the following command when the redmine stack already up an running
 
-docker run -it --rm -v /opt/www/logs:/var/log/letsencrypt:rw \
-                    -v /opt/www/redmine/letsencrypt:/etc/letsencrypt:rw \
-                    -v redmine_frontend-www:/var/www:rw \
-                    -v /opt/www/redmine/frontend-certs:/certs:rw \
-                    certbot/certbot certonly --webroot -w /var/www --email admin@bolyshev.com -d rm.bolyshev.com --agree-tos
+docker run --rm -v /opt/www/logs:/var/log/letsencrypt:rw -v /opt/www/redmine/letsencrypt:/etc/letsencrypt:rw -v redmine_frontend-www:/var/www:rw \
+   certbot/certbot certonly --webroot -w /var/www --email admin@bolyshev.com -d rm.bolyshev.com --agree-tos
 
 # You should get the following
 Saving debug log to /var/log/letsencrypt/letsencrypt.log
@@ -110,11 +107,7 @@ IMPORTANT NOTES:
 
 #
 2. Renew certificates
-
-docker run --rm -v /opt/www/logs:/var/log/letsencrypt:rw \
-                -v /opt/www/redmine/letsencrypt:/etc/letsencrypt:rw \
-                -v redmine_frontend-www:/var/www:rw \
-                -v /opt/www/redmine/frontend-certs:/certs:rw certbot/certbot renew
+00 23 * * * cd /opt/www/redmine && docker run --rm -v /opt/www/logs:/var/log/letsencrypt:rw -v /opt/www/redmine/letsencrypt:/etc/letsencrypt:rw -v redmine_frontend-www:/var/www:rw certbot/certbot renew
 
 Saving debug log to /var/log/letsencrypt/letsencrypt.log
 
