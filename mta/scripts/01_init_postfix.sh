@@ -16,7 +16,7 @@ postconf -e smtp_generic_maps="hash:/etc/postfix/generic"
 postconf -e append_at_myorigin="yes"
 
 # Fix host lookup errors like this "postfix/smtpd[236]: connect from unknown[10.0.1.2]"
-postfix -e smtp_host_lookup="dns,native"
+postconf -e smtp_host_lookup="dns,native"
 
 ############# Update aliases
 cat > /etc/postfix/aliases <<EOF
