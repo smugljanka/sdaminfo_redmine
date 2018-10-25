@@ -35,7 +35,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - app-net
+      - redmine_redmine-net
 
   mail-dkim:
     image: smugljanka/postfix-relay-opendkim
@@ -66,13 +66,13 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - app-net
+      - redmine_redmine-net
 
 volumes:
   postfix-pool:
 
 networks:
-  app-net:
+  redmine_redmine-net:
     external: true
 
 secrets:
