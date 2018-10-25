@@ -22,8 +22,8 @@ services:
       - ./scripts/02_init_rsyslog.sh:/docker-entrypoint.d/02_init_rsyslog.sh
     environment:
       TZ: UTC
-      POSTFIX_HOSTNAME: mx.<YOUR_MAIL_DOMAIN>
-      POSTFIX_DOMAIN: <YOUR_MAIL_DOMAIN>
+      POSTFIX_HOSTNAME: rm.bolyshev.com
+      POSTFIX_DOMAIN: bolyshev.com
       POSTFIX_NETWORKS: ''
       DKIM_ADDRESS: mail-dkim
       DKIM_PORT: 14999
@@ -54,9 +54,9 @@ services:
       - ./scripts/02_init_rsyslog.sh:/docker-entrypoint.d/02_init_rsyslog.sh
     environment:
       TZ: UTC
-      POSTFIX_DOMAIN: <YOUR_MAIL_DOMAIN>
+      POSTFIX_DOMAIN: bolyshev.com
       POSTFIX_NETWORKS_REGEXP_MAP: '10.*.*.*'
-      DKIM_SELECTOR: <YOUR_DKIM_SELECTOR>
+      DKIM_SELECTOR: mail
       DKIM_PORT: 14999
     entrypoint: ["/docker-entrypoint.sh"]
     command: ["opendkim", "-f", "-l"]
@@ -77,4 +77,4 @@ networks:
 
 secrets:
   domain-dkim-key:
-    file: ./path/to/your.domain.com.priv
+    file: ./SSL/redmine.local.key.pem
