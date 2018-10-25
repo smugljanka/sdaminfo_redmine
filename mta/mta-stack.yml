@@ -47,8 +47,8 @@ services:
       - source: domain-dkim-key
         target: domain.private
         mode: 600
-        uid: "100"
-        gid: "101"
+        uid: opendkim
+        gid: opendkim
     volumes:
       - ./scripts/01_init_opendkim.sh:/docker-entrypoint.d/01_init_opendkim.sh
       - ./scripts/02_init_rsyslog.sh:/docker-entrypoint.d/02_init_rsyslog.sh
