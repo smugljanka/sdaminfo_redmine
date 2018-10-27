@@ -1,7 +1,5 @@
 .idea
-redmine-backup/
-redmine-files/
-plugins/
+data/
 letsencrypt/
 !letsencrypt/renewal-hooks/deploy
 !letsencrypt/renewal-hooks/pre

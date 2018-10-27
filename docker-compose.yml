@@ -3,7 +3,7 @@
 # Pre-requisites:
 # git clone git@github.com:smugljanka/sdaminfo_redmine.git redmine
 # cd redmine
-# mkdir -p data/{plugins,db-backups,files}
+# mkdir -p frontend-certs letsencrypt plugins redmine-backup redmine-file
 #
 # Usage:
 # docker stack init --advertise-addr=IP
@@ -22,9 +22,6 @@ services:
       replicas: 1
       restart_policy:
         condition: none
-      placement:
-        constraints:
-          - node.labels.type == web
     ports:
       - "80:80"
       - "443:443"
@@ -62,19 +59,16 @@ services:
       replicas: 1
       restart_policy:
         condition: none
-      placement:
-        constraints:
-          - node.labels.type == web
     volumes:
-      - ./data/files:/usr/src/redmine/files
-      - ./data/plugins:/usr/src/redmine/plugins
+      - ./redmine-files:/usr/src/redmine/files
+      - ./plugins:/usr/src/redmine/plugins
       - ./config/configuration.yml:/usr/src/redmine/config/configuration.yml
     configs:
       - source: wait_for_it
         target: /wait_for_it.sh
         mode: 0555
     env_file:
-      - env/database.env
+      - ./env/database.env
     networks:
       - redmine-net
     command: ["/wait_for_it.sh", "-t", "60", "db:3306", "--", "/docker-entrypoint.sh", "rails", "server", "-b", "0.0.0.0"]
@@ -88,17 +82,16 @@ services:
       restart_policy:
         condition: on-failure
       placement:
-        constraints:
-          - node.labels.type == db
+        constraints: [node.role == manager]
     configs:
       - source: backup_database
         target: /backup-redmine-db.sh
         mode: 0555
     env_file:
-      - env/database.env
+      - ./env/database.env
     volumes:
       - redmine-db-datadir:/var/lib/mysql
-      - ./data/db-backups:/backup
+      - ./redmine-backup:/backup
     healthcheck:
       test: mysql -uroot --password=$$MYSQL_ROOT_PASSWORD -e "quit" 2>/dev/null
       interval: 10s
@@ -117,9 +110,6 @@ services:
       replicas: 1
       restart_policy:
         condition: none
-      placement:
-        constraints:
-          - node.labels.type == web
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./cron/crontab:/tmp/cron-root:ro
@@ -143,6 +133,7 @@ services:
       - redmine-net
 volumes:
   redmine-db-datadir:
+  redmine-backup:
   frontend-www:
 
 networks:

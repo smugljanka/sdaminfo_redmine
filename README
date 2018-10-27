@@ -1,18 +1,109 @@
 ##############################################################
 ## PREREQUISITES                                            ##
 ##############################################################
-1. Prepare a database configuration and make changes to your database parameters
+
+############################################################################
+# Standalone docker host
+############################################################################
+
+1. Prepare a database configuration
 cp env/database.env.example env/database.env
 vi env/database.env
 
-2. Deploy redmine stack
-2.1 Prepare stack secrets in redmine-stack-prod.yml
-2.2 Deploy new stack "redmine"
+2. Create required folders
+mkdir -p frontend-certs letsencrypt plugins redmine-backup redmine-file
+
+3. Deploy redmine stack
+3.1 Prepare stack secrets in redmine-stack-prod.yml
+3.2 Deploy new stack "redmine"
 docker stack deploy -c ./redmine-stack.yml -c ./redmine-stack-prod.yml redmine
 
-3. Deploy MTA stack
-3.1 Prepare stack secrets in mta-stack-prod.yml
-3.2 Deploy new stack "mta"
+4. Deploy MTA stack
+4.1 Prepare stack secrets in mta-stack-prod.yml
+4.2 Deploy new stack "mta"
+
+############################################################################
+# Docker stack on multiple hosts
+############################################################################
+
+# Note: Keep in mind that to use the ingress network in the swarm, you need to have the
+# following ports open between the swarm nodes before you enable swarm mode:
+
+- Port 7946 TCP/UDP for container network discovery.
+- Port 4789 UDP for the container ingress network.
+
+1. configure firewall on the all VMs:
+firewall-cmd --add-port=4000/tcp --permanent --zone=public
+firewall-cmd --add-port=2376/tcp --permanent --zone=public
+firewall-cmd --add-port=2377/tcp --permanent --zone=public
+firewall-cmd --add-port=7946/tcp --permanent --zone=public
+firewall-cmd --add-port=7946/udp --permanent --zone=public
+firewall-cmd --add-port=4789/udp --permanent --zone=public
+firewall-cmd --reload
+
+
+2. Create docker machines
+docker-machine create --driver generic --generic-ip-address=IP_HOST1 --generic-ssh-key ~/.ssh/id_rsa vm-node1
+docker-machine create --driver generic --generic-ip-address=IP_HOST2 --generic-ssh-key ~/.ssh/id_rsa vm-node2
+docker-machine create --driver generic --generic-ip-address=IP_HOST3 --generic-ssh-key ~/.ssh/id_rsa vm-node3
+
+3. Init docker stack
+3.1 Create manager
+
+$ docker-machine ssh vm-node1 "docker swarm init --advertise-addr=IP_HOST1"
+
+# Note: To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+#       To add a manager to this swarm, run 'docker swarm join-token worker' and follow the instructions.
+
+3.2 Add workers to the stack
+3.2.1 Add two workers via ssh connection
+docker-machine ssh vm-node2 "docker swarm join --token TOKEN IP_HOST1:2377"
+docker-machine ssh vm-node3 "docker swarm join --token TOKEN IP_HOST1:2377"
+
+or
+
+3.2.1 Add worker via docker shell environment
+# Run the given command to configure your shell to talk to vm-node2
+eval $(docker-machine env vm-node2)
+
+# Then run the following command to join vm-node2 to the manager
+docker swarm join --token TOKEN IP_HOST1:2377
+
+# Then, do the same for vm-node3
+eval $(docker-machine env vm-node3)
+docker swarm join --token TOKEN IP_HOST1:2377
+
+# Finally, unset all variables and return to your host
+eval $(docker-machine env -u	)
+
+3.3 View nodes in the created stack (where is the vm-node1 running as manager)
+docker-machine ssh vm-node1 "docker node ls"
+
+
+4. Let's set a node type
+#  vm-node3 should works as db node
+docker node update --label-add type=db vm-node3
+
+# vm-node1 and vm-node2 should work as web node
+docker node update --label-add type=web vm-node1
+docker node update --label-add type=web vm-node2
+
+# Delete label from the node vm-node2
+docker node update --label-rm type vm-node2
+
+
+5. Deploy stack - run from the my host
+# copy project on the nodes
+for i in "vm-node1 vm-node2 vm-node3";
+  do
+    docker-machine ssh vm-node${i} "mkdir -p /var/www"
+    docker-machine scp -r sdaminfo-redmine ${i}:/var/www/redmine
+    docker-machine ssh vm-node${i} "mkdir -p /var/www/redmine/data/{plugins,db-backups,files}"
+done
+
+# deploy stack
+docker-machine ssh vm-node1 'cd /var/www/redmine && docker stack deploy -c ./redmine-stack.yml redmine'
+
 
 
 ##############################################################
