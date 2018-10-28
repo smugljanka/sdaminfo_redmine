@@ -1,11 +1,7 @@
 .idea
-redmine-backup/
-redmine-files/
-plugins/
-letsencrypt/
-!letsencrypt/renewal-hooks/deploy
-!letsencrypt/renewal-hooks/pre
-!letsencrypt/renewal-hooks/post
-frontend-certs/
+data/backups/
+data/files/
+data/plugins/
+data/letsencrypt/
 env/database.env
 

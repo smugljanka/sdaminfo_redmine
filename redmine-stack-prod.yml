@@ -2,6 +2,8 @@ version: '3.6'
 
 secrets:
   front-cert:
-    file: /opt/www/redmine/letsencrypt/live/rm.bolyshev.com/fullchain.pem
+#    external: true
+    file: /opt/www/redmine/data/letsencrypt/live/rm.bolyshev.com/fullchain.pem
   front-key:
-    file: /opt/www/redmine/letsencrypt/live/rm.bolyshev.com/privkey.pem
+#    external: true
+    file: /opt/www/redmine/data/letsencrypt/live/rm.bolyshev.com/privkey.pem

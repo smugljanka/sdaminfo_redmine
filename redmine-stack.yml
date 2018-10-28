@@ -3,14 +3,15 @@
 # Pre-requisites:
 # git clone git@github.com:smugljanka/sdaminfo_redmine.git redmine
 # cd redmine
-# mkdir -p frontend-certs letsencrypt plugins redmine-backup redmine-file
+# mkdir -p data/{letsencrypt,plugins,backup,files}
 #
 # Usage:
 # docker stack init --advertise-addr=IP
 #
-# Dev stack https://local.redmine/
+# Deploy dev stack, URL: https://local.redmine/
 # docker stack deploy -c ./redmine-stack.yml redmine
-# Prod stack https://rm.bolyshev.com/
+#
+# Deployment prod stack, URL: https://rm.bolyshev.com/
 # docker stack deploy -c ./redmine-stack.yml -c ./redmine-stack-prod.yml redmine
 
 version: '3.6'
@@ -41,11 +42,12 @@ services:
         target: privkey.pem
         mode: 0600
     volumes:
+      - frontend-certs:/etc/nginx/certs:rw
       - frontend-www:/var/www
     entrypoint: ["/nginx-entrypoint.sh"]
     healthcheck:
       test: wget -S -q http://127.0.0.1/healthcheck/ &>/dev/stdout | egrep -o "HTTP\/.\.. 200 OK" >/dev/null
-      interval: 30s
+      interval: 10s
       timeout: 10s
       retries: 3
     networks:
@@ -60,8 +62,8 @@ services:
       restart_policy:
         condition: none
     volumes:
-      - ./redmine-files:/usr/src/redmine/files
-      - ./plugins:/usr/src/redmine/plugins
+      - ./data/files:/usr/src/redmine/files
+      - ./data/plugins:/usr/src/redmine/plugins
       - ./config/configuration.yml:/usr/src/redmine/config/configuration.yml
     configs:
       - source: wait_for_it
@@ -91,7 +93,7 @@ services:
       - ./env/database.env
     volumes:
       - redmine-db-datadir:/var/lib/mysql
-      - ./redmine-backup:/backup
+      - ./data/backups:/backup
     healthcheck:
       test: mysql -uroot --password=$$MYSQL_ROOT_PASSWORD -e "quit" 2>/dev/null
       interval: 10s
@@ -131,10 +133,12 @@ services:
       retries: 3
     networks:
       - redmine-net
+
 volumes:
   redmine-db-datadir:
   redmine-backup:
   frontend-www:
+  frontend-certs:
 
 networks:
   redmine-net:
@@ -157,6 +161,6 @@ configs:
 
 secrets:
   front-cert:
-    file: ./SSL/redmine.local.crt.pem
+    file: ./SSL/dev/redmine.local.crt.pem
   front-key:
-    file: ./SSL/redmine.local.key.pem
+    file: ./SSL/dev/redmine.local.key.pem
