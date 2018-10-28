@@ -4,7 +4,7 @@
 
 # git clone git@github.com:smugljanka/sdaminfo_redmine.git redmine
 # cd redmine
-# mkdir -p data/{letsencrypt,plugins,backup,files}
+# mkdir -p data/{letsencrypt,plugins,backups,files}
 
 1. Prepare a database configuration and make changes to your database parameters
 cp env/database.env.example env/database.env
