@@ -19,6 +19,17 @@ docker stack deploy -c ./redmine-stack.yml -c ./redmine-stack-prod.yml redmine
 3.1 Prepare stack secrets in mta-stack-prod.yml
 3.2 Deploy new stack "mta"
 
+#############################################################
+## CRON configuration                                      ##
+#############################################################
+crontab -e
+
+# Start renewal certificate and private key
+00 23 * * * cd /opt/www/redmine && docker run --rm -v /opt/www/logs:/var/log/letsencrypt:rw -v /opt/www/redmine/data/letsencrypt:/etc/letsencrypt:rw -v redmine_frontend-www:/var/www:rw certbot/certbot renew
+
+# Update certificate of frontend if it was changed
+30 23 * * * sh /opt/www/redmine/update_service_certs.sh rm.bolyshev.com redmine redmine-frontend
+
 
 ##############################################################
 ##          UPGRADE REDMINE                                 ##
