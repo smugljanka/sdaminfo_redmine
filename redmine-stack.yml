@@ -34,15 +34,8 @@ services:
       - source: nginx-entrypoint
         target: /nginx-entrypoint.sh
         mode: 0755
-    secrets:
-      - source: front-cert
-        target: fullchain.pem
-        mode: 0664
-      - source: front-key
-        target: privkey.pem
-        mode: 0600
     volumes:
-      - frontend-certs:/etc/nginx/certs:rw
+      - ./nginx/certs:/etc/nginx/certs:rw
       - frontend-www:/var/www
     entrypoint: ["/nginx-entrypoint.sh"]
     healthcheck:
@@ -138,7 +131,6 @@ volumes:
   redmine-db-datadir:
   redmine-backup:
   frontend-www:
-  frontend-certs:
 
 networks:
   redmine-net:
@@ -159,8 +151,3 @@ configs:
   nginx-entrypoint:
     file: ./scripts/nginx-entrypoint.sh
 
-secrets:
-  front-cert:
-    file: ./SSL/dev/redmine.local.crt.pem
-  front-key:
-    file: ./SSL/dev/redmine.local.key.pem

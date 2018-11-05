@@ -15,8 +15,10 @@ if [ ! -e "/etc/nginx/certs" ]; then
   mkdir -p /etc/nginx/certs
 fi
 
-# Copy the server certificate and private key to the nginx certs folder
-cp -a -f /run/secrets/fullchain.pem /etc/nginx/certs/ || true
-cp -a -f /run/secrets/privkey.pem /etc/nginx/certs/ || true
+if [ -e "/etc/nginx/certs/privkey.pem" ]; then
+  chown -R root. /etc/nginx/certs
+  chmod 0600 /etc/nginx/certs/privkey.pem
+  chmod 0640 /etc/nginx/certs/fullchain.pem
+fi
 
 exec nginx -g "daemon off;"
