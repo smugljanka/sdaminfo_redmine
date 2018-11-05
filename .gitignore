@@ -4,4 +4,10 @@ data/files/
 data/plugins/
 data/letsencrypt/
 env/database.env
-
+nginx/letsencrypt/accounts
+nginx/letsencrypt/archive
+nginx/letsencrypt/csr
+nginx/letsencrypt/keys
+nginx/letsencrypt/live
+nginx/letsencrypt/renewal
+nginx/certs/*.txt
