@@ -10,15 +10,20 @@ acme-challenge test page !
 EOF
 fi
 
-# Create a folder for nginx certificates
-if [ ! -e "/etc/nginx/certs" ]; then
-  mkdir -p /etc/nginx/certs
+# Copy certificates from LetsEncrypt runtime folder
+cp --force -H /etc/letsencrypt/live/${DOMAIN}/*.pem /etc/nginx/certs/ || true
+
+# If a certificate and a privkey not found, copy the self-signed certificate and privkey
+if [ ! -e "/etc/nginx/certs/privkey.pem" ];then
+  cp /etc/nginx/certs/dev-privkey.pem /etc/nginx/certs/privkey.pem
+fi
+if [ ! -e "/etc/nginx/certs/fullchain.pem" ]; then
+  cp /etc/nginx/certs/dev-fullchain.pem /etc/nginx/certs/fullchain.pem
 fi
 
-if [ -e "/etc/nginx/certs/privkey.pem" ]; then
-  chown -R root. /etc/nginx/certs
-  chmod 0600 /etc/nginx/certs/privkey.pem
-  chmod 0640 /etc/nginx/certs/fullchain.pem
-fi
+# Set required mode
+chmod 0600 /etc/nginx/certs/privkey.pem || true
+chmod 0640 /etc/nginx/certs/fullchain.pem || true
 
+# Start nginx
 exec nginx -g "daemon off;"

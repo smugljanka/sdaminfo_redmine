@@ -10,4 +10,6 @@ nginx/letsencrypt/csr
 nginx/letsencrypt/keys
 nginx/letsencrypt/live
 nginx/letsencrypt/renewal
-nginx/certs/*.txt
+nginx/certs/*
+!nginx/certs/dev-fullchain.pem
+!nginx/certs/dev-privkey.pem

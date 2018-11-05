@@ -35,8 +35,11 @@ services:
         target: /nginx-entrypoint.sh
         mode: 0755
     volumes:
+      - ./nginx/letsencrypt:/etc/letsencrypt
       - ./nginx/certs:/etc/nginx/certs:rw
       - frontend-www:/var/www
+    environment:
+      DOMAIN: rm.bolyshev.com
     entrypoint: ["/nginx-entrypoint.sh"]
     healthcheck:
       test: wget -S -q http://127.0.0.1/healthcheck/ &>/dev/stdout | egrep -o "HTTP\/.\.. 200 OK" >/dev/null
