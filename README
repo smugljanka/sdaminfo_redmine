@@ -25,11 +25,10 @@ docker stack deploy -c ./redmine-stack.yml -c ./redmine-stack-prod.yml redmine
 crontab -e
 
 # Start renewal certificate and private key
-#00 23 * * * cd /opt/www/redmine && docker run --rm -v /opt/www/logs:/var/log/letsencrypt:rw -v /opt/www/redmine/data/letsencrypt:/etc/letsencrypt:rw -v redmine_frontend-www:/var/www:rw certbot/certbot renew
 00 23 * * * cd /opt/www/redmine && docker run --rm -v /opt/www/logs:/var/log/letsencrypt:rw -v /opt/www/redmine/nginx/letsencrypt:/etc/letsencrypt:rw -v redmine_frontend-www:/var/www:rw -v /opt/www/redmine/nginx/certs:/certs:rw certbot/certbot renew
 
-# Update certificate of frontend if it was changed
-#30 23 * * * sh /opt/www/redmine/update_service_certs.sh rm.bolyshev.com redmine redmine-frontend
+# Update certificate of frontend - reload nginx in the container
+30 23 * * * docker container exec $(docker container ls --filter=name=redmine_redmine-frontend* -q) nginx -s reload
 
 
 ##############################################################
