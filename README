@@ -4,23 +4,21 @@
 
 # git clone git@github.com:smugljanka/sdaminfo_redmine.git redmine
 # cd redmine
-# mkdir -p data/{letsencrypt,plugins,backups,files}
+# mkdir -p data/{plugins,backups,files}
 
 1. Prepare a database configuration and make changes to your database parameters
 cp env/database.env.example env/database.env
 vi env/database.env
 
 2. Deploy redmine stack
-2.1 Prepare stack secrets in redmine-stack-prod.yml
-2.2 Deploy new stack "redmine"
-docker stack deploy -c ./redmine-stack.yml -c ./redmine-stack-prod.yml redmine
+docker stack deploy -c ./redmine-stack.yml redmine
 
 3. Deploy MTA stack
 3.1 Prepare stack secrets in mta-stack-prod.yml
 3.2 Deploy new stack "mta"
 
 #############################################################
-## CRON configuration                                      ##
+## CRON configuration on the docker host                   ##
 #############################################################
 crontab -e
 

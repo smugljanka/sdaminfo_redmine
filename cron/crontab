@@ -2,3 +2,9 @@
 00 23 * * * /docker-wrapper.sh --stack ${STACK_NAME:-redmine} --service redmine-db -- /backup-redmine-db.sh &>/var/log/cron.log
 # Delete backups older then one week
 00 23 * * * /docker-wrapper.sh --stack ${STACK_NAME:-redmine} --service redmine-db -- find /backup/ -type f -mtime +7 -delete
+
+# Fix file system permissions https://www.redmine.org/projects/redmine/wiki/RedmineInstall#Step-8-File-system-permissions
+*/2 * * * * /docker-wrapper.sh --stack ${STACK_NAME:-redmine} --service redmine-backend -- find /usr/src/redmine/files /usr/src/redmine/log /usr/src/redmine/public/plugin_assets /usr/src/redmine/plugins \! -user redmine -exec chown -R redmine:redmine '{}' +
+# directories 755, files 644:
+*/2 * * * * /docker-wrapper.sh --stack ${STACK_NAME:-redmine} --service redmine-backend -- find /usr/src/redmine/files /usr/src/redmine/log /usr/src/redmine/public/plugin_assets /usr/src/redmine/plugins -type d \! -perm 755 -exec chmod 755 '{}' +
+*/3 * * * * /docker-wrapper.sh --stack ${STACK_NAME:-redmine} --service redmine-backend -- find /usr/src/redmine/files /usr/src/redmine/log /usr/src/redmine/public/plugin_assets /usr/src/redmine/plugins -type f \! -perm 644 -exec chmod 644 '{}' +

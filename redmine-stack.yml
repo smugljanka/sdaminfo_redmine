@@ -3,16 +3,16 @@
 # Pre-requisites:
 # git clone git@github.com:smugljanka/sdaminfo_redmine.git redmine
 # cd redmine
-# mkdir -p data/{letsencrypt,plugins,backups,files}
+# mkdir -p data/{plugins,backups,files}
 #
 # Usage:
 # docker stack init --advertise-addr=IP
 #
-# Deploy dev stack, URL: https://local.redmine/
+# Dev only:
+# Add the following line "127.0.0.1 rm.bolyshev.com" to /etc/hosts
+
+# Deploy docker stack
 # docker stack deploy -c ./redmine-stack.yml redmine
-#
-# Deployment prod stack, URL: https://rm.bolyshev.com/
-# docker stack deploy -c ./redmine-stack.yml -c ./redmine-stack-prod.yml redmine
 
 version: '3.6'
 services:
@@ -58,8 +58,8 @@ services:
       restart_policy:
         condition: none
     volumes:
-      - ./data/files:/usr/src/redmine/files:rw
-      - ./data/plugins:/usr/src/redmine/plugins:rw
+      - ./data/files:/usr/src/redmine/files
+      - ./data/plugins:/usr/src/redmine/plugins
       - ./config/configuration.yml:/usr/src/redmine/config/configuration.yml:ro
     configs:
       - source: wait_for_it
