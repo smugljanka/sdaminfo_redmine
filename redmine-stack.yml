@@ -58,9 +58,9 @@ services:
       restart_policy:
         condition: none
     volumes:
-      - ./data/files:/usr/src/redmine/files
-      - ./data/plugins:/usr/src/redmine/plugins
-      - ./config/configuration.yml:/usr/src/redmine/config/configuration.yml
+      - ./data/files:/usr/src/redmine/files:rw
+      - ./data/plugins:/usr/src/redmine/plugins:rw
+      - ./config/configuration.yml:/usr/src/redmine/config/configuration.yml:ro
     configs:
       - source: wait_for_it
         target: /wait_for_it.sh
