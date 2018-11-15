@@ -78,7 +78,7 @@ docker container prune -f
 
 1. Run the following command when the redmine stack already up an running
 
-docker run --rm -v /opt/www/logs:/var/log/letsencrypt:rw -v /opt/www/redmine/letsencrypt:/etc/letsencrypt:rw -v redmine_frontend-www:/var/www:rw \
+docker run --rm -v /opt/www/logs:/var/log/letsencrypt:rw -v /opt/www/redmine/nginx/letsencrypt:/etc/letsencrypt:rw -v redmine_frontend-www:/var/www:rw \
    certbot/certbot certonly --webroot -w /var/www --email admin@bolyshev.com -d rm.bolyshev.com --agree-tos
 
 # You should get the following
@@ -119,23 +119,7 @@ IMPORTANT NOTES:
    Donating to EFF:                    https://eff.org/donate-le
 
 
-#
-2. Renew certificates
-00 23 * * * cd /opt/www/redmine && docker run --rm -v /opt/www/logs:/var/log/letsencrypt:rw -v /opt/www/redmine/letsencrypt:/etc/letsencrypt:rw -v redmine_frontend-www:/var/www:rw certbot/certbot renew
 
-Saving debug log to /var/log/letsencrypt/letsencrypt.log
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Processing /etc/letsencrypt/renewal/rm.bolyshev.com.conf
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Cert not yet due for renewal
-
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-The following certs are not due for renewal yet:
-  /etc/letsencrypt/live/rm.bolyshev.com/fullchain.pem expires on 2019-01-08 (skipped)
-No renewals were attempted.
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 ######### Docker host MTA configuration ##################
 # http://www.redmine.org/projects/redmine/wiki/EmailConfiguration

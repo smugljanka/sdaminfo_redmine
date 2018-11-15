@@ -60,7 +60,7 @@ services:
     volumes:
       - ./data/files:/usr/src/redmine/files
       - ./data/plugins:/usr/src/redmine/plugins
-      - ./config/configuration.yml:/usr/src/redmine/config/configuration.yml:ro
+      - ./config/configuration.yml:/usr/src/redmine/config/configuration.yml:rw
     configs:
       - source: wait_for_it
         target: /wait_for_it.sh
