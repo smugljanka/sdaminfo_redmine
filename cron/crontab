@@ -1,5 +1,9 @@
 # Backup redmine database every day at 23.00
 00 23 * * * /docker-wrapper.sh --stack ${STACK_NAME:-redmine} --service redmine-db -- /backup-redmine-db.sh &>/var/log/cron.log
+
+# Sync backups to AWS S3 bucket
+15 23 * * * /sync2s3.sh
+
 # Delete backups older then one week
 00 23 * * * /docker-wrapper.sh --stack ${STACK_NAME:-redmine} --service redmine-db -- find /backup/ -type f -mtime +7 -delete
 
