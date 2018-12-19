@@ -4,14 +4,13 @@ USER root
 ADD start.sh /
 
 RUN apk update && \
-    apk add --no-cache --virtual .build-deps \
+    apk add --no-cache \
     py-pip \
     python && \
     pip install --upgrade --no-cache-dir \
     pip \
     awscli && \
     chmod +x /start.sh && \
-    apk del .build-deps && \
     find /usr/local -depth \
        \( \
            \( -type d -a \( -name test -o -name tests \) \) \
@@ -25,4 +24,4 @@ ENV KEY=,SECRET=,REGION=,BUCKET=,BUCKET_PATH=/,PARAMS=
 
 VOLUME ["/backup"]
 
-ENTRYPOINT ["/start.sh"]
+CMD ["/start.sh"]
